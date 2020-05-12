@@ -1,78 +1,3 @@
-resource "aws_vpc" "main" {
-  cidr_block         = "10.5.0.0/16"
-  enable_dns_support = true
-  enable_dns_hostnames = true
-
-  tags = {
-    Name = "testing"
-    environment = "testing"
-    "kubernetes.io/cluster/testing" = "shared"
-  }
-}
-
-data "aws_availability_zones" "available" {
-  state = "available"
-}
-
-resource "aws_subnet" "main" {
-  count = length(data.aws_availability_zones.available.names)
-
-  vpc_id            = aws_vpc.main.id
-  availability_zone = data.aws_availability_zones.available.names[count.index]
-  cidr_block        = cidrsubnet(aws_vpc.main.cidr_block, 8, count.index)
-
-  tags = {
-    Name = format("testing-%02d",count.index + 1)
-    environment = "testing"
-    az = data.aws_availability_zones.available.names[count.index]
-    "kubernetes.io/cluster/testing" = "shared"
-  }
-}
-
-resource "aws_internet_gateway" "main" {
-  vpc_id = aws_vpc.main.id
-
-  tags = {
-    environment = "testing"
-  }
-}
-
-resource "aws_route_table" "public" {
-  vpc_id = aws_vpc.main.id
-
-  route {
-    cidr_block = "0.0.0.0/0"
-    gateway_id = aws_internet_gateway.main.id
-  }
-
-  tags = {
-    environment = "testing"
-    exposition = "public"
-  }
-}
-
-resource "aws_subnet" "node-group" {
-  count = length(data.aws_availability_zones.available.names)
-
-  vpc_id            = aws_vpc.main.id
-  availability_zone = data.aws_availability_zones.available.names[count.index]
-  cidr_block        = cidrsubnet(aws_vpc.main.cidr_block, 8, count.index + length(data.aws_availability_zones.available.names))
-  map_public_ip_on_launch = true
-
-  tags = {
-    Name = format("testing-ng-%02d",count.index + 1)
-    environment = "testing"
-    az = data.aws_availability_zones.available.names[count.index]
-    "kubernetes.io/cluster/testing" = "shared"
-  }
-}
-
-resource "aws_route_table_association" "public" {
-  count = length(aws_subnet.node-group)
-  subnet_id      = aws_subnet.node-group[count.index].id
-  route_table_id = aws_route_table.public.id
-}
-
 resource "aws_security_group" "main" {
   vpc_id = aws_vpc.main.id
 
@@ -106,68 +31,13 @@ resource "aws_security_group" "main" {
   }
 }
 
-resource "aws_iam_role" "eks" {
-  name = "eks-cluster-testing"
-
-  assume_role_policy = jsonencode({
-    Statement = [{
-      Action = "sts:AssumeRole"
-      Effect = "Allow"
-      Principal = {
-        Service = "eks.amazonaws.com"
-      }
-    }]
-    Version = "2012-10-17"
-  })
-}
-
-resource "aws_iam_role_policy_attachment" "eks-cluster" {
-  policy_arn = "arn:aws:iam::aws:policy/AmazonEKSClusterPolicy"
-  role       = aws_iam_role.eks.name
-}
-
-resource "aws_iam_role_policy_attachment" "eks-service" {
-  policy_arn = "arn:aws:iam::aws:policy/AmazonEKSServicePolicy"
-  role       = aws_iam_role.eks.name
-}
-
-resource "aws_iam_role" "node" {
-  name = "eks-cluster-testing-node"
-
-  assume_role_policy = jsonencode({
-    Statement = [{
-      Action = "sts:AssumeRole"
-      Effect = "Allow"
-      Principal = {
-        Service = "ec2.amazonaws.com"
-      }
-    }]
-    Version = "2012-10-17"
-  })
-}
-
-resource "aws_iam_role_policy_attachment" "eks-node-worker" {
-  policy_arn = "arn:aws:iam::aws:policy/AmazonEKSWorkerNodePolicy"
-  role       = aws_iam_role.node.name
-}
-
-resource "aws_iam_role_policy_attachment" "eks-node-cni" {
-  policy_arn = "arn:aws:iam::aws:policy/AmazonEKS_CNI_Policy"
-  role       = aws_iam_role.node.name
-}
-
-resource "aws_iam_role_policy_attachment" "eks-node-registry" {
-  policy_arn = "arn:aws:iam::aws:policy/AmazonEC2ContainerRegistryReadOnly"
-  role       = aws_iam_role.node.name
-}
-
 resource "aws_eks_cluster" "main" {
   name     = "testing"
   role_arn = aws_iam_role.eks.arn
   version = "1.16"
 
   vpc_config {
-    subnet_ids = aws_subnet.main.*.id
+    subnet_ids = aws_subnet.control-plane.*.id
     security_group_ids = [ aws_security_group.main.id ]
     endpoint_private_access = true
     endpoint_public_access  = true
@@ -208,7 +78,7 @@ resource "aws_eks_node_group" "main" {
   cluster_name    = aws_eks_cluster.main.name
   node_group_name = "testing"
   node_role_arn   = aws_iam_role.node.arn
-  subnet_ids      = aws_subnet.node-group.*.id
+  subnet_ids      = aws_subnet.worker.*.id
   version = "1.16"
 
   dynamic "remote_access" {
