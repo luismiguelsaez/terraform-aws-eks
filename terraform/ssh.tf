@@ -18,6 +18,32 @@ data "aws_ami" "default" {
   }
 }
 
+resource "aws_security_group" "bastion" {
+  name        = format("%s-bastion", var.defaults.environment)
+  description = "Allow TLS inbound traffic"
+  vpc_id      = aws_vpc.main.id
+
+  ingress {
+    description = "SSH from internet"
+    from_port   = 22
+    to_port     = 22
+    protocol    = "tcp"
+    cidr_blocks = [ "0.0.0.0/0" ]
+  }
+
+  egress {
+    from_port   = 0
+    to_port     = 0
+    protocol    = "-1"
+    cidr_blocks = [ "0.0.0.0/0" ]
+  }
+
+  tags = {
+    Name = format("%s-bastion", var.defaults.environment)
+    environment = var.defaults.environment
+  }
+}
+
 resource "aws_instance" "bastion" {
   ami           = data.aws_ami.default.id
   instance_type = "t2.micro"
@@ -28,7 +54,7 @@ resource "aws_instance" "bastion" {
   key_name = aws_key_pair.node-group.key_name
 
   subnet_id = aws_subnet.public[0].id
-  vpc_security_group_ids = [ aws_eks_cluster.main.vpc_config[0].cluster_security_group_id ]
+  vpc_security_group_ids = [ aws_security_group.bastion.id ]
 
   tags = {
     Name = format("%s-bastion", var.defaults.environment)
