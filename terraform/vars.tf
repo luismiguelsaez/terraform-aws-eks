@@ -1,14 +1,7 @@
 
-variable "node-group" {
-  type    = map
-  default = {
-    "remote-access" = true
-  }
-}
-
-variable "vpc" {
+variable "defaults" {
   type = map
   default = {
-    "subnet-public" = false
+    environment = "testing"
   }
 }

@@ -1,5 +1,5 @@
 resource "aws_eks_cluster" "main" {
-  name     = "testing"
+  name     = var.defaults.environment
   role_arn = aws_iam_role.eks.arn
   version = "1.16"
 
@@ -17,7 +17,7 @@ resource "aws_eks_cluster" "main" {
 }
 
 data "aws_eks_cluster_auth" "main" {
-  name = "testing"
+  name = var.defaults.environment
 }
 
 resource "aws_security_group_rule" "remote-access" {
@@ -31,13 +31,13 @@ resource "aws_security_group_rule" "remote-access" {
 
 resource "aws_eks_node_group" "main" {
   cluster_name    = aws_eks_cluster.main.name
-  node_group_name = "testing"
+  node_group_name = var.defaults.environment
   node_role_arn   = aws_iam_role.node.arn
   subnet_ids      = flatten([ aws_subnet.private.*.id ])
   version = "1.16"
 
   remote_access {
-    ec2_ssh_key = "testing"
+    ec2_ssh_key = aws_key_pair.node-group.key_name
   }
 
   scaling_config {
@@ -55,6 +55,6 @@ resource "aws_eks_node_group" "main" {
   ]
 
   tags = {
-    "kubernetes.io/cluster/testing" = "owned"
+    "kubernetes.io/cluster/${var.defaults.environment}" = "owned"
   }
 }

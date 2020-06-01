@@ -5,9 +5,9 @@ resource "aws_vpc" "main" {
   enable_dns_hostnames = true
 
   tags = {
-    Name = "testing"
-    environment = "testing"
-    "kubernetes.io/cluster/testing" = "shared"
+    Name = var.defaults.environment
+    environment = var.defaults.environment
+    "kubernetes.io/cluster/${var.defaults.environment}" = "shared"
   }
 }
 
@@ -24,10 +24,10 @@ resource "aws_subnet" "private" {
   cidr_block        = cidrsubnet(aws_vpc.main.cidr_block, 8, count.index)
 
   tags = {
-    Name = format("testing-%02d",count.index + 1)
-    environment = "testing"
+    Name = format("%s-%02d", var.defaults.environment, count.index + 1)
+    environment = var.defaults.environment
     az = data.aws_availability_zones.available.names[count.index]
-    "kubernetes.io/cluster/testing" = "shared"
+    "kubernetes.io/cluster/${var.defaults.environment}" = "shared"
   }
 }
 
@@ -41,10 +41,10 @@ resource "aws_subnet" "public" {
   #map_public_ip_on_launch = true
 
   tags = {
-    Name = format("testing-ng-%02d",count.index + 1)
-    environment = "testing"
+    Name = format("%s-ng-%02d", var.defaults.environment, count.index + 1)
+    environment = var.defaults.environment
     az = data.aws_availability_zones.available.names[count.index]
-    "kubernetes.io/cluster/testing" = "shared"
+    "kubernetes.io/cluster/${var.defaults.environment}" = "shared"
   }
 }
 
@@ -53,7 +53,7 @@ resource "aws_internet_gateway" "gw" {
   vpc_id = aws_vpc.main.id
 
   tags = {
-    environment = "testing"
+    environment = var.defaults.environment
     exposition = "public"
   }
 }
@@ -68,7 +68,7 @@ resource "aws_nat_gateway" "nat" {
   subnet_id     = aws_subnet.public[0].id
 
   tags = {
-    environment = "testing"
+    environment = var.defaults.environment
     exposition = "private"
     az = data.aws_availability_zones.available.names[0]
   }
@@ -84,7 +84,7 @@ resource "aws_route_table" "private" {
   }
 
   tags = {
-    environment = "testing"
+    environment = var.defaults.environment
     exposition = "private"
   }
 }
@@ -99,7 +99,7 @@ resource "aws_route_table" "public" {
   }
 
   tags = {
-    environment = "testing"
+    environment = var.defaults.environment
     exposition = "private"
   }
 }

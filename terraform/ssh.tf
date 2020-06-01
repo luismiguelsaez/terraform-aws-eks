@@ -4,7 +4,7 @@ resource "tls_private_key" "main" {
 }
 
 resource "aws_key_pair" "node-group" {
-  key_name   = "testing"
+  key_name   = var.defaults.environment
   public_key = tls_private_key.main.public_key_openssh
 }
 
@@ -31,8 +31,8 @@ resource "aws_instance" "bastion" {
   vpc_security_group_ids = [ aws_eks_cluster.main.vpc_config[0].cluster_security_group_id ]
 
   tags = {
-    Name = format("testing-bastion")
-    environment = "testing"
+    Name = format("%s-bastion", var.defaults.environment)
+    environment = var.defaults.environment
   }
 }
 

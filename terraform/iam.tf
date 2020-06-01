@@ -1,5 +1,5 @@
 resource "aws_iam_role" "eks" {
-  name = "eks-cluster-testing"
+  name = format("eks-cluster-%s", var.defaults.environment)
 
   assume_role_policy = jsonencode({
     Statement = [{
@@ -24,7 +24,7 @@ resource "aws_iam_role_policy_attachment" "eks-service" {
 }
 
 resource "aws_iam_role" "node" {
-  name = "eks-cluster-testing-node"
+  name = format("eks-nodes-%s", var.defaults.environment)
 
   assume_role_policy = jsonencode({
     Statement = [{
