@@ -61,11 +61,3 @@ resource "aws_instance" "bastion" {
     environment = var.defaults.environment
   }
 }
-
-output "ssh_private_key" {
-  value = tls_private_key.main.private_key_pem
-}
-
-output "bastion_dns_name" {
-  value = aws_instance.bastion.public_dns
-}
