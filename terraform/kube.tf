@@ -6,8 +6,6 @@ provider "kubernetes" {
 }
 
 provider "helm" {
-  tiller_image = "gcr.io/kubernetes-helm/tiller:v2.9.1"
-
   kubernetes {
     host                   = aws_eks_cluster.main.endpoint
     cluster_ca_certificate = base64decode(aws_eks_cluster.main.certificate_authority.0.data)
