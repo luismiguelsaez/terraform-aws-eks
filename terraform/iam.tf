@@ -56,15 +56,14 @@ resource "aws_iam_role_policy_attachment" "eks-node-registry" {
 }
 
 ### Enable OIDC provider
-# Fetch OIDC provider thumbprint for root CA
 data "external" "thumbprint" {
-  program = [ "./get-oidc-thumbprint", data.aws_region.current.name ]
+  program = [ "./scripts/get-oidc-thumbprint.sh", data.aws_region.current.name ]
 }
 
 resource "aws_iam_openid_connect_provider" "main" {
   client_id_list  = [ "sts.amazonaws.com"]
   # Get thumbprint: https://medium.com/@marcincuber/amazon-eks-with-oidc-provider-iam-roles-for-kubernetes-services-accounts-59015d15cb0c
-  thumbprint_list = []
+  thumbprint_list = [ data.external.thumbprint.result.thumbprint ]
   url             = aws_eks_cluster.main.identity.0.oidc.0.issuer
 }
 

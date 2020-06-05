@@ -31,8 +31,11 @@ $ aws eks update-kubeconfig --region eu-west-1 --name testing --profile default
 
 ### Run testing pod
 ```
-$ kubectl run -i --tty busybox --image=busybox --restart=Never -- sh
+$ kubectl run -i --tty busybox --image=busybox --serviceaccount=aws-node --restart=Never -- sh
 $ kubectl delete pod busybox
+
+$ kubectl apply -f ../k8s/test-pod.yml
+$ kubectl exec -it alpine -- sh
 ```
 
 ### SSH connection ( connect to workers through bastion )
