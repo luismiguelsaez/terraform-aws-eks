@@ -17,7 +17,7 @@ resource "aws_s3_bucket_policy" "main" {
     {
       bucket_name = local.s3-bucket-name,
       iam_role_id = aws_iam_role.s3.unique_id,
-      user_arn    = data.aws_caller_identity.current.arn
+      user_arn = data.aws_caller_identity.current.arn
     }
   )
 }
