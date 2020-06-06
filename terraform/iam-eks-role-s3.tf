@@ -1,3 +1,8 @@
+locals {
+  s3-sa-name      = "s3"
+  s3-sa-namespace = "default"
+}
+
 resource "aws_iam_policy" "s3" {
   name        = format("%s-s3", var.defaults.environment)
   description = "S3 access test policy"
@@ -12,7 +17,7 @@ resource "aws_iam_role" "s3" {
       Effect = "Allow"
       Condition = {
         StringEquals = {
-          "${replace(aws_iam_openid_connect_provider.main.url, "https://", "")}:sub" = "system:serviceaccount:default:s3"
+          "${replace(aws_iam_openid_connect_provider.main.url, "https://", "")}:sub" = "system:serviceaccount:${local.s3-sa-namespace}:${local.s3-sa-name}"
         }
       }
       Principal = {
