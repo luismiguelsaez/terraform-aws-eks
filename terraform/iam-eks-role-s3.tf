@@ -4,6 +4,24 @@ locals {
   s3-bucket-name  = "testing-s3-k8s"
 }
 
+resource "aws_s3_bucket" "main" {
+  bucket = local.s3-bucket-name
+  acl    = "private"
+}
+
+resource "aws_s3_bucket_policy" "main" {
+  bucket = aws_s3_bucket.main.id
+
+  policy = templatefile(
+    "aws/s3/policy/default.tpl",
+    {
+      bucket_name = local.s3-bucket-name,
+      iam_role_id = aws_iam_role.s3.unique_id,
+      user_arn    = data.aws_caller_identity.current.arn
+    }
+  )
+}
+
 resource "aws_iam_policy" "s3" {
   name        = format("%s-%s", var.defaults.environment, local.s3-sa-name)
   description = "S3 access test policy"
