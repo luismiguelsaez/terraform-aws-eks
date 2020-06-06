@@ -1,7 +1,7 @@
 locals {
   s3-sa-name      = "s3"
   s3-sa-namespace = "default"
-  s3-bucket-name  = "testing-s3-k8s"
+  s3-bucket-name  = "eks-s3-permissions-test"
 }
 
 resource "aws_s3_bucket" "main" {
@@ -11,26 +11,13 @@ resource "aws_s3_bucket" "main" {
 
 resource "aws_s3_bucket_policy" "main" {
   bucket = aws_s3_bucket.main.id
-
-  policy = templatefile(
-    "aws/s3/policy/default.tpl",
-    {
-      bucket_name = local.s3-bucket-name,
-      iam_role_id = aws_iam_role.s3.unique_id,
-      user_arn = data.aws_caller_identity.current.arn
-    }
-  )
+  policy = templatefile("aws/s3/policy/default.tpl",{bucket_arn = aws_s3_bucket.main.arn,iam_role_id = aws_iam_role.s3.unique_id,user_arn = data.aws_caller_identity.current.arn})
 }
 
 resource "aws_iam_policy" "s3" {
   name        = format("%s-%s", var.defaults.environment, local.s3-sa-name)
   description = "S3 access test policy"
-  policy      = templatefile(
-    "aws/iam/policy/s3.tpl",
-    {
-      bucket_name = local.s3-bucket-name
-    }
-  )
+  policy      = templatefile("aws/iam/policy/s3.tpl",{bucket_arn = aws_s3_bucket.main.arn})
 }
 
 resource "aws_iam_role" "s3" {
