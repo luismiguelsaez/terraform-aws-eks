@@ -3,7 +3,7 @@ kind: Pod
 metadata:
   name: alpine
 spec:
-  serviceAccountName: aws-node
+  serviceAccountName: s3-test
   automountServiceAccountToken: true
   containers:
   - name: alpine

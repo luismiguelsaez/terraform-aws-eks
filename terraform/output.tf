@@ -25,6 +25,6 @@ output "oidc_identity_issuer" {
   value = aws_eks_cluster.main.identity
 }
 
-output "oidc_iam_role_arn" {
-  value = aws_iam_role.oidc.arn
+output "iam_s3_role_arn" {
+  value = aws_iam_role.s3_test.arn
 }

@@ -15,13 +15,3 @@ provider "helm" {
     load_config_file       = false
   }
 }
-
-resource "kubernetes_service_account" "oidc" {
-  metadata {
-    name = "aws-node"
-    namespace = "default"
-    annotations = {
-      "eks.amazonaws.com/role-arn" = aws_iam_role.oidc.arn
-    }
-  }
-}
