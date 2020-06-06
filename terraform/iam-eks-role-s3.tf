@@ -25,7 +25,12 @@ resource "aws_s3_bucket_policy" "main" {
 resource "aws_iam_policy" "s3" {
   name        = format("%s-%s", var.defaults.environment, local.s3-sa-name)
   description = "S3 access test policy"
-  policy      = templatefile("aws/iam/policy/s3.tpl",{ bucket_name = local.s3-bucket-name })
+  policy      = templatefile(
+    "aws/iam/policy/s3.tpl",
+    {
+      bucket_name = local.s3-bucket-name
+    }
+  )
 }
 
 resource "aws_iam_role" "s3" {
