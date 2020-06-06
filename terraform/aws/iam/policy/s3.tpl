@@ -7,7 +7,7 @@
               "s3:ListBucket"
           ],
           "Resource": [
-              "arn:aws:s3:::testing-s3-k8s"
+              "arn:aws:s3:::${bucket_name}"
           ]
       },
       {
@@ -18,7 +18,7 @@
               "s3:GetObject"
           ],
           "Resource": [
-              "arn:aws:s3:::testing-s3-k8s/*"
+              "arn:aws:s3:::${bucket_name}/*"
           ]
       }
   ]

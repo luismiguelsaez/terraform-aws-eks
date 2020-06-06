@@ -1,16 +1,17 @@
 locals {
   s3-sa-name      = "s3"
   s3-sa-namespace = "default"
+  s3-bucket-name  = "testing-s3-k8s"
 }
 
 resource "aws_iam_policy" "s3" {
-  name        = format("%s-s3", var.defaults.environment)
+  name        = format("%s-%s", var.defaults.environment, local.s3-sa-name)
   description = "S3 access test policy"
-  policy      = file("aws/iam/policy/s3_test.json")
+  policy      = templatefile("aws/iam/policy/s3.tpl",{ bucket_name = local.s3-bucket-name })
 }
 
 resource "aws_iam_role" "s3" {
-   name = format("%s-s3", var.defaults.environment)
+   name = format("%s-%s", var.defaults.environment, local.s3-sa-name)
    assume_role_policy = jsonencode({
     Statement = [{
       Action = "sts:AssumeRoleWithWebIdentity"
@@ -35,7 +36,7 @@ resource "aws_iam_role_policy_attachment" "s3" {
 
 resource "kubernetes_service_account" "oidc" {
   metadata {
-    name = "s3"
+    name = local.s3-sa-name
     namespace = "default"
     annotations = {
       "eks.amazonaws.com/role-arn" = aws_iam_role.s3.arn
