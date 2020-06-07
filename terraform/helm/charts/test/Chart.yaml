@@ -1,0 +1,6 @@
+apiVersion: v2
+name: test
+description: Test chart for AWS S3 access
+type: application
+version: 0.1.0
+appVersion: 0.1.0

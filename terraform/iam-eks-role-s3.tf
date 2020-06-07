@@ -44,12 +44,12 @@ resource "aws_iam_role_policy_attachment" "s3" {
   policy_arn = aws_iam_policy.s3.arn
 }
 
-resource "kubernetes_service_account" "oidc" {
-  metadata {
-    name = local.s3-sa-name
-    namespace = "default"
-    annotations = {
-      "eks.amazonaws.com/role-arn" = aws_iam_role.s3.arn
-    }
-  }
-}
+#resource "kubernetes_service_account" "oidc" {
+#  metadata {
+#    name = local.s3-sa-name
+#    namespace = "default"
+#    annotations = {
+#      "eks.amazonaws.com/role-arn" = aws_iam_role.s3.arn
+#    }
+#  }
+#}

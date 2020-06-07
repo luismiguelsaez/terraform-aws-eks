@@ -19,8 +19,3 @@ output "ssh_private_key" {
 output "bastion_dns_name" {
   value = aws_instance.bastion.public_dns
 }
-
-### OIDC issuer info
-output "oidc_identity_issuer" {
-  value = aws_eks_cluster.main.identity
-}
