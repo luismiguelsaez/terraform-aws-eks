@@ -1,7 +1,7 @@
 
-variable "node-group" {
-  type    = map
+variable "defaults" {
+  type = map
   default = {
-    "remote-access" = false
+    environment = "testing"
   }
 }

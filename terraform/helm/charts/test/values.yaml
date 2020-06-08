@@ -1,0 +1,13 @@
+replicaCount: 1
+
+image:
+  repository: alpine
+  pullPolicy: IfNotPresent
+  tag: 3.11
+
+serviceAccount:
+  create: true
+  annotations: {
+    "eks.amazonaws.com/role-arn": "test"
+  }
+  name: ""
