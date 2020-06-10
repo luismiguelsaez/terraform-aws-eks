@@ -47,7 +47,7 @@ resource "kubernetes_role_binding" "kubectl" {
 
   role_ref {
     kind      = "Role"
-    name      = kubernetes_role.kubectl.name
+    name      = "admin-access"
     api_group = "rbac.authorization.k8s.io"
   }
 
