@@ -1,3 +1,6 @@
+# Resources needed to grant pods with role permissions for S3 actions
+# Pods are required to be defined with specific serviceaccount in order to get the S3 permissions
+
 locals {
   s3-sa-name      = "s3"
   s3-sa-namespace = "default"

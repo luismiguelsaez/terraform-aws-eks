@@ -1,3 +1,6 @@
+# Resources needed to grant permissions to IAM users that aren't cluster's owners
+# Users need to assume required role ( see README.md ) in order to get EKS cluster operating permissions
+# granted in kubernetes role resource
 
 resource "aws_iam_role" "kubectl" {
   name = format("%s-kubectl", var.defaults.environment)
@@ -57,3 +60,12 @@ resource "kubernetes_role_binding" "kubectl" {
     api_group = "rbac.authorization.k8s.io"
   }
 }
+
+### k8s role IAM binding
+data "kubernetes_config map" "aws-auth" {
+  metadata {
+    name = "aws-auth"
+  }
+}
+
+resource "kubernetes_config_map" "aws-auth" {}
