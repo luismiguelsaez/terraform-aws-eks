@@ -4,6 +4,9 @@
 $ aws configure --profile default
 ```
 
+### Install clients
+https://docs.aws.amazon.com/eks/latest/userguide/getting-started-eksctl.html
+
 ### Create infrasctructure
 ```
 $ cd terraform
@@ -25,8 +28,13 @@ $ sudo chmod +x /usr/local/bin/kubectl
 ```
 
 ### Create kubectl config
+- Without assuming role
 ```
 $ aws eks update-kubeconfig --region eu-west-1 --name testing --profile default
+```
+- Assuming admin role ( for non-creator users ) https://aws.amazon.com/es/premiumsupport/knowledge-center/eks-iam-permissions-namespaces/
+```
+$ aws eks update-kubeconfig --region eu-west-1 --name testing --profile default --role-arn $(terraform output kubectl_role_arn)
 ```
 
 ### Run testing pod

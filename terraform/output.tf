@@ -11,6 +11,10 @@ output "current_region_name" {
   value = data.aws_region.current.name
 }
 
+output "kubectl_role_arn" {
+  value = aws_iam_role.kubectl.arn
+}
+
 ### Bastion data
 output "ssh_private_key" {
   value = tls_private_key.main.private_key_pem
