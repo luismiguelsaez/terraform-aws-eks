@@ -1,0 +1,7 @@
+- groups:
+  - system:bootstrappers
+  - system:nodes
+  rolearn: ${eks_nodes_role_arn}
+  username: system:node:{{EC2PrivateDNSName}}
+- rolearn: ${kubectl_user_role_arn}
+  username: kubectl

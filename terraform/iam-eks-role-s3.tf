@@ -47,6 +47,7 @@ resource "aws_iam_role_policy_attachment" "s3" {
   policy_arn = aws_iam_policy.s3.arn
 }
 
+# Service account will be created within helm chart
 #resource "kubernetes_service_account" "oidc" {
 #  metadata {
 #    name = local.s3-sa-name

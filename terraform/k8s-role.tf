@@ -37,7 +37,7 @@ resource "kubernetes_role" "kubectl" {
 
   rule {
     api_groups     = ["","apps","batch","extensions"]
-    resources      = ["configmaps","cronjonbs","deployments","events","ingresses","jobs","pods","pods/attach","pods/exec","pods/log","pods/portforward","secrets","services"]
+    resources      = ["nodes","configmaps","cronjonbs","deployments","events","ingresses","jobs","pods","pods/attach","pods/exec","pods/log","pods/portforward","secrets","services"]
     verbs          = ["create","delete","describe","get", "list", "watch","patch","update"]
   }
 }
@@ -62,10 +62,20 @@ resource "kubernetes_role_binding" "kubectl" {
 }
 
 ### k8s role IAM binding
-data "kubernetes_config map" "aws-auth" {
+data "kubernetes_config_map" "aws-auth" {
   metadata {
-    name = "aws-auth"
+    name      = "aws-auth"
+    namespace = "kube-system"
   }
 }
 
-resource "kubernetes_config_map" "aws-auth" {}
+resource "kubernetes_config_map" "aws-auth-user" {
+  metadata {
+    name      = "aws-auth-user"
+    namespace = "kube-system"
+  }
+
+  data = {
+    mapRoles = templatefile("./k8s/aws-auth_configmap.yml",{ eks_nodes_role_arn = aws_iam_role.node.arn, kubectl_user_role_arn = aws_iam_role.kubectl.arn })
+  }
+}
