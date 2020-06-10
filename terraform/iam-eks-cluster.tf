@@ -1,6 +1,6 @@
 ### Create EKS cluster role
 resource "aws_iam_role" "eks" {
-  name = format("eks-cluster-%s", var.defaults.environment)
+  name = format("%s-eks-cluster", var.defaults.environment)
 
   assume_role_policy = jsonencode({
     Statement = [{
@@ -26,7 +26,7 @@ resource "aws_iam_role_policy_attachment" "eks-service" {
 
 ### Create EKS nodes role
 resource "aws_iam_role" "node" {
-  name = format("eks-nodes-%s", var.defaults.environment)
+  name = format("%s-eks-nodes", var.defaults.environment)
 
   assume_role_policy = jsonencode({
     Statement = [{
