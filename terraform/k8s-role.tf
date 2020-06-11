@@ -62,16 +62,9 @@ resource "kubernetes_role_binding" "kubectl" {
 }
 
 ### k8s role IAM binding
-data "kubernetes_config_map" "aws-auth" {
+resource "kubernetes_config_map" "aws-auth" {
   metadata {
     name      = "aws-auth"
-    namespace = "kube-system"
-  }
-}
-
-resource "kubernetes_config_map" "aws-auth-user" {
-  metadata {
-    name      = "aws-auth-user"
     namespace = "kube-system"
   }
 

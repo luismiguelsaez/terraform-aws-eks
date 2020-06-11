@@ -15,10 +15,6 @@ output "kubectl_role_arn" {
   value = aws_iam_role.kubectl.arn
 }
 
-output "aws_auth_configmap" {
-  value = data.kubernetes_config_map.aws-auth
-}
-
 ### Bastion data
 output "ssh_private_key" {
   value = tls_private_key.main.private_key_pem
